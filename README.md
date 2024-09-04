@@ -29,8 +29,8 @@ SpanExporter otlpGrpcSpanExporter = OtlpGrpcSpanExporter.builder()
     .build();
 ```
 
-•	setEndpoint("http://localhost:4317"): The endpoint where Tempo is running (usually localhost:4317 for local instances).
-•	setTimeout(Duration.ofSeconds(0)): Timeout setting for sending the trace data.
+• setEndpoint("http://localhost:4317"): The endpoint where Tempo is running (usually localhost:4317 for local instances).
+• setTimeout(Duration.ofSeconds(0)): Timeout setting for sending the trace data.
 
 2.	OpenTelemetry SDK Setup
 
