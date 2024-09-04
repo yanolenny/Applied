@@ -1,2 +1,2 @@
-# Applied
-Applied Materials
+# Applied Materials - Open Observability
+
