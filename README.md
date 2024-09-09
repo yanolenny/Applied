@@ -69,6 +69,7 @@ try (Scope scope = parentSpan.makeCurrent()) {
 4.	Tracing in Methods
 
 	•  First Method (firstMethod()): Starts a span and performs some operation.
+
 	•  Second Method (secondMethod()): Starts a child span under the span from the first method, simulating a sub-operation.
 
 These spans are connected through OpenTelemetry, which tracks the relationship between them.
