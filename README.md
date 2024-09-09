@@ -2,17 +2,17 @@
 
 Project Structure
 
-	•	build.gradle: Contains the necessary dependencies for OpenTelemetry, including the OTLP exporter for sending trace data to Tempo.
-	•	OpenTelemetryToTempoExample.java: The main class that demonstrates how to create traces and spans using OpenTelemetry.
+	•  build.gradle: Contains the necessary dependencies for OpenTelemetry, including the OTLP exporter for sending trace data to Tempo.
+	•  OpenTelemetryToTempoExample.java: The main class that demonstrates how to create traces and spans using OpenTelemetry.
 
 Dependencies
 
 The following dependencies are used in this project:
 
-	•	OpenTelemetry API (io.opentelemetry:opentelemetry-api): The core API for creating and managing telemetry data like traces and spans.
-	•	OpenTelemetry SDK (io.opentelemetry:opentelemetry-sdk): The SDK implementation for configuring OpenTelemetry.
-	•	OTLP Exporter (io.opentelemetry:opentelemetry-exporter-otlp): Used to export trace data to Tempo via gRPC.
-	•	gRPC (io.grpc:grpc-netty-shaded): Required for sending trace data to Tempo over gRPC.
+	•  OpenTelemetry API (io.opentelemetry:opentelemetry-api): The core API for creating and managing telemetry data like traces and spans.
+	•  OpenTelemetry SDK (io.opentelemetry:opentelemetry-sdk): The SDK implementation for configuring OpenTelemetry.
+	•  OTLP Exporter (io.opentelemetry:opentelemetry-exporter-otlp): Used to export trace data to Tempo via gRPC.
+	•  gRPC (io.grpc:grpc-netty-shaded): Required for sending trace data to Tempo over gRPC.
 
 Code Explanation
 
@@ -29,8 +29,8 @@ SpanExporter otlpGrpcSpanExporter = OtlpGrpcSpanExporter.builder()
     .build();
 ```
 
-• setEndpoint("http://localhost:4317"): The endpoint where Tempo is running (usually localhost:4317 for local instances).
-• setTimeout(Duration.ofSeconds(0)): Timeout setting for sending the trace data.
+	•  setEndpoint("http://localhost:4317"): The endpoint where Tempo is running (usually localhost:4317 for local instances).
+	•  setTimeout(Duration.ofSeconds(0)): Timeout setting for sending the trace data.
 
 2.	OpenTelemetry SDK Setup
 
@@ -46,13 +46,15 @@ OpenTelemetrySdk openTelemetry = OpenTelemetrySdk.builder()
     .buildAndRegisterGlobal();
 ```
 
-•	BatchSpanProcessor: Batches and sends spans asynchronously to improve performance.
+	•  BatchSpanProcessor: Batches and sends spans asynchronously to improve performance.
 
 3.	Parent and Child Spans
    
 The application creates two methods (firstMethod() and secondMethod()) to demonstrate how parent and child spans are used in a trace hierarchy:
-	•	firstMethod(): Creates a span named firstMethodSpan and calls secondMethod(), which creates a child span.
-	•	secondMethod(): Creates a child span named secondMethodSpan, using the span from firstMethod() as its parent.
+
+	•  firstMethod(): Creates a span named firstMethodSpan and calls secondMethod(), which creates a child span.
+	•  secondMethod(): Creates a child span named secondMethodSpan, using the span from firstMethod() as its parent.
+
 Here’s how the methods are structured:
 
 ```java
@@ -65,8 +67,10 @@ try (Scope scope = parentSpan.makeCurrent()) {
 ```
 
 4.	Tracing in Methods
-	•	First Method (firstMethod()): Starts a span and performs some operation.
-	•	Second Method (secondMethod()): Starts a child span under the span from the first method, simulating a sub-operation.
+
+	•  First Method (firstMethod()): Starts a span and performs some operation.
+	•  Second Method (secondMethod()): Starts a child span under the span from the first method, simulating a sub-operation.
+
 These spans are connected through OpenTelemetry, which tracks the relationship between them.
 
 Example Trace Flow
