@@ -62,9 +62,7 @@ public class OpenTelemetryToTempoExample {
 
     private static void secondMethod() {
         // Start a new child span for this method
-        Span secondMethodSpan = tracer.spanBuilder("secondMethodSpan")
-            .setParent(Span.current())  // Set the current span as parent
-            .startSpan();
+        Span secondMethodSpan = tracer.spanBuilder("secondMethodSpan").startSpan();
         try (Scope scope = secondMethodSpan.makeCurrent()) {
             // Do some work in this method
             System.out.println("In the second method, doing work...");
