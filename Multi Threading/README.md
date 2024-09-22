@@ -18,12 +18,92 @@ The application simulates multithreading using `ExecutorService` and demonstrate
 1. **Main Thread**: Starts a parent span (`MainThreadSpan`).
 2. **Worker Threads**: Each worker thread (Task-1, Task-2, Task-3) starts a child span that is part of the parent span.
 
-### Key Features:
+## Detailed Explanation
 
-- Proper propagation of OpenTelemetry trace context across thread boundaries.
-- Each worker thread creates a child span that links back to the parent span in the main thread.
+In this example, we use `ExecutorService` to run tasks in multiple threads. Each task creates a child span with the parent span passed from the main thread. OpenTelemetry ensures that the trace context is propagated correctly across threads.
 
-### Running the Example
+### 1. Setting Up the Tracer
+
+We use the `GlobalOpenTelemetry.getTracer()` to obtain a tracer instance that allows us to create spans.
+
+```java
+private static final Tracer tracer = GlobalOpenTelemetry.getTracer("multithreading-example");
+```
+
+### 2. Creating the Parent Span in the Main Thread
+
+In the `main()` method, we start a parent span that represents the main task in the main thread. This parent span will have child spans created by tasks running in separate threads.
+
+```java
+Span parentSpan = tracer.spanBuilder("MainThreadSpan").startSpan();
+try (Scope scope = parentSpan.makeCurrent()) {
+    System.out.println("Starting the parent span in the main thread");
+    
+    // Submit tasks to the thread pool
+    for (int i = 0; i < 3; i++) {
+        executor.submit(new WorkerTask("Task-" + (i + 1), Context.current()));
+    }
+} finally {
+    parentSpan.end();
+}
+```
+
+Here, we:
+- Start the span using `spanBuilder()`.
+- Use a `Scope` to ensure the parent span is set as the current context.
+- Pass the current context (`Context.current()`) to each task so they can propagate the parent span's trace.
+
+### 3. Propagating the Trace Context Across Threads
+
+Each task is represented by the `WorkerTask` class, which implements `Runnable`. The `WorkerTask` constructor takes the current trace context and a task name. The child span is created with the parent context.
+
+```java
+@Override
+public void run() {
+    Span span = tracer.spanBuilder(taskName)
+            .setParent(parentContext)
+            .startSpan();
+
+    try (Scope scope = span.makeCurrent()) {
+        System.out.println(taskName + " is executing in thread: " + Thread.currentThread().getName());
+        
+        // Simulate some work
+        Thread.sleep(1000);
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+    } finally {
+        span.end();
+    }
+}
+```
+
+- **`setParent(parentContext)`**: This ensures that the new span is a child of the parent span from the main thread.
+- **`try (Scope scope = span.makeCurrent())`**: Ensures that the child span is the current context for the work done inside the thread.
+- **`span.end()`**: The span is ended when the task finishes, ensuring it is properly closed.
+
+### 4. Simulating Multithreaded Execution
+
+We use an `ExecutorService` to manage a pool of worker threads. Each task is submitted to the thread pool, and the trace context is propagated from the main thread to the worker threads.
+
+```java
+ExecutorService executor = Executors.newFixedThreadPool(3);
+for (int i = 0; i < 3; i++) {
+    executor.submit(new WorkerTask("Task-" + (i + 1), Context.current()));
+}
+```
+
+### 5. Shutting Down the Executor
+
+After submitting all tasks, we gracefully shut down the executor and wait for all tasks to finish.
+
+```java
+executor.shutdown();
+executor.awaitTermination(10, TimeUnit.SECONDS);
+```
+
+This ensures that the program waits for the threads to complete before exiting.
+
+## Running the Example
 
 1. **Navigate to the project directory**:
    ```bash
@@ -40,7 +120,7 @@ The application simulates multithreading using `ExecutorService` and demonstrate
 3. **View the trace**:
    Open Grafana Tempo (or any other OpenTelemetry-compatible tool) to view the traces. You should see a parent span (`MainThreadSpan`) with child spans for each worker task.
 
-### Project Structure
+## Project Structure
 
 - **`MultiThreadedOpenTelemetryExample.java`**: The main class that demonstrates the use of OpenTelemetry in a multithreaded environment.
 
