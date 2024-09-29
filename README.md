@@ -1,4 +1,4 @@
-# Applied Materials - Open Observability
+# Open Observability
 
 Project Structure
 
