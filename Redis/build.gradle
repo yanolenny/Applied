@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // OpenTelemetry dependencies
+    implementation 'io.opentelemetry:opentelemetry-api:1.30.0'
+    implementation 'io.opentelemetry:opentelemetry-sdk:1.30.0'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp:1.30.0'
+    implementation 'io.opentelemetry:opentelemetry-extension-annotations:1.3.0'
+
+    implementation 'io.grpc:grpc-netty-shaded:1.54.0'
+
+    // Redis (Jedis) dependency for Redis example
+    implementation 'redis.clients:jedis:4.4.3'
+    implementation 'com.google.code.gson:gson:2.9.0'  // Add Gson dependency here
+    implementation 'io.lettuce:lettuce-core:6.1.5.RELEASE'
+}
+
+application {
+    // Default main class (optional, you can specify in tasks)
+    mainClass = 'com.redis.example.RedisProducer'  // Replace with a class that should run by default
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+// Define the path to the OpenTelemetry Java agent
+def otelAgentPath = "/path/to/project/src/main/java/opentelemetry-javaagent.jar"
+
+// Task to run the RedisProducer with the Java Agent
+task runProducer(type: JavaExec) {
+    group = 'application'
+    description = 'Run the RedisProducer with OpenTelemetry Java Agent'
+    main = 'com.redis.example.RedisProducer'
+    classpath = sourceSets.main.runtimeClasspath
+    jvmArgs = [
+        "-javaagent:${otelAgentPath}",
+        "-Dotel.exporter.otlp.endpoint=http://localhost:4317",
+        "-Dotel.resource.attributes=service.name=redis-producer",
+        "-Dotel.exporter.otlp.protocol=grpc"
+    ]
+}
+
+// Task to run the RedisConsumer with the Java Agent
+task runConsumer(type: JavaExec) {
+    group = 'application'
+    description = 'Run the RedisConsumer with OpenTelemetry Java Agent'
+    main = 'com.redis.example.RedisConsumer'
+    classpath = sourceSets.main.runtimeClasspath
+    jvmArgs = [
+        "-javaagent:${otelAgentPath}",
+        "-Dotel.exporter.otlp.endpoint=http://localhost:4317",
+        "-Dotel.resource.attributes=service.name=redis-consumer",
+        "-Dotel.exporter.otlp.protocol=grpc"
+    ]
+}
