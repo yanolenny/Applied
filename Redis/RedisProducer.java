@@ -2,6 +2,7 @@ package com.redis.example;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.SpanKind; // Correct import for SpanKind
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
@@ -46,9 +47,16 @@ public class RedisProducer {
             message.put("data", "Message from RedisProducer");
             message.put("random-attribute", String.valueOf((int) (Math.random() * 100)));
 
+            // Extract and print the current context (trace ID, span ID, etc.)
+            Context currentContext = Context.current();
+            SpanContext spanContext = producerSpan.getSpanContext();
+            log("Current Trace ID: " + spanContext.getTraceId());
+            log("Current Span ID: " + spanContext.getSpanId());
+            log("Current Trace Flags: " + spanContext.getTraceFlags());
+
             // Inject the current context into the message
             log("Injecting context into the Redis message...");
-            propagator.inject(Context.current(), message, MapTextMapSetter.INSTANCE);
+            propagator.inject(currentContext, message, MapTextMapSetter.INSTANCE);
 
             log("Sending message with context...");
             jedis.xadd(REDIS_STREAM, XAddParams.xAddParams(), message);
