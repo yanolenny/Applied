@@ -17,6 +17,7 @@ dependencies {
     implementation 'io.grpc:grpc-netty-shaded:1.54.0'
 
     // Redis (Jedis) dependency for Redis example
+    //implementation 'redis.clients:jedis:3.6.3'
     implementation 'redis.clients:jedis:4.4.3'
     implementation 'com.google.code.gson:gson:2.9.0'  // Add Gson dependency here
     implementation 'io.lettuce:lettuce-core:6.1.5.RELEASE'
@@ -24,7 +25,7 @@ dependencies {
 
 application {
     // Default main class (optional, you can specify in tasks)
-    mainClass = 'com.redis.example.RedisProducer'  // Replace with a class that should run by default
+    mainClass = 'com.example.OpenTelemetryToTempoExample'  // Replace with a class that should run by default
 }
 
 tasks.withType(JavaCompile) {
@@ -32,7 +33,7 @@ tasks.withType(JavaCompile) {
 }
 
 // Define the path to the OpenTelemetry Java agent
-def otelAgentPath = "/path/to/project/src/main/java/opentelemetry-javaagent.jar"
+def otelAgentPath = "/home/yaniv/opentelemetry/java/Redis/src/main/java/opentelemetry-javaagent.jar"
 
 // Task to run the RedisProducer with the Java Agent
 task runProducer(type: JavaExec) {
